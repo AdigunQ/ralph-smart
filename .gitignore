@@ -1,0 +1,33 @@
+# Ralph Security Researcher - .gitignore
+
+# Findings and logs
+findings/loop.log
+findings/*.log
+
+# Target projects (user adds their own)
+target/*
+!target/.gitkeep
+
+# Temporary files
+*.tmp
+*.bak
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Auto-generated plans (committed when complete)
+# IMPLEMENTATION_PLAN.md is tracked to show progress
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Node
+node_modules/

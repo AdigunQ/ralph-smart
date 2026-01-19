@@ -1,0 +1,22 @@
+# Placeholder file to ensure target/ directory is tracked by git
+# Delete this file and add your smart contract project here
+
+## How to add your target project:
+
+### Option 1: Clone a repository
+```bash
+rm target/.gitkeep
+git clone https://github.com/project/repo target
+```
+
+### Option 2: Symlink existing project
+```bash
+rm target/.gitkeep
+ln -s /path/to/your/project/* target/
+```
+
+### Option 3: Copy files
+```bash
+rm target/.gitkeep
+cp -r /path/to/contracts/* target/
+```
