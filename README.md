@@ -281,6 +281,55 @@ export CODEX_MODEL="gpt-4o"
 ./loop.sh
 ```
 
+## 📖 Manual Deep Reading Audit
+
+For audits that require **deep human-like analysis** rather than pattern matching, use the Manual Deep Reading approach.
+
+> _"The bug is always in the line you didn't read carefully."_
+
+### Philosophy
+
+This approach mimics how a senior human auditor reads code:
+
+- **Line by line**, character by character
+- **No checklists**, no automated patterns
+- **Focus on understanding**, not scanning
+
+### Key Focus Areas
+
+1. **Data Layer First**
+
+   - Read every struct, mapping, and state variable
+   - Understand what each represents in the real world
+   - Trace how variables are initialized
+
+2. **State Transitions**
+
+   - For every function that modifies state, ask:
+   - _"What must be true before? What will be true after?"_
+   - Read state changes in order - bugs hide between steps
+
+3. **Slow Read on Critical Functions**
+
+   - Pick the function that moves money
+   - Read it character by character
+   - Every operator, every comparison, every assignment
+
+4. **Uncomfortable Questions**
+   - What if I'm a malicious user?
+   - What if I'm a malicious admin?
+   - What if external dependencies fail?
+
+### Timeline
+
+A proper deep read of 1000 lines takes **4-8 hours**.
+
+If you're going faster, you're not reading deeply enough.
+
+### Full Guide
+
+See **[MANUAL_AUDIT_DEEP_READING.md](MANUAL_AUDIT_DEEP_READING.md)** for the complete methodology.
+
 ## 💰 Cost Estimation
 
 Running Ralph with premium models can be expensive:
