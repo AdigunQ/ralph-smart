@@ -25,6 +25,9 @@ cp -r "$SOURCE_DIR/.agent" "$TARGET_DIR/"
 cp -r "$SOURCE_DIR/scripts" "$TARGET_DIR/"
 cp "$SOURCE_DIR/CLAUDE.md" "$TARGET_DIR/"
 cp "$SOURCE_DIR/AGENTS.md" "$TARGET_DIR/"
+cp "$SOURCE_DIR/loop.sh" "$TARGET_DIR/"
+cp "$SOURCE_DIR/PROMPT_plan.md" "$TARGET_DIR/"
+cp "$SOURCE_DIR/PROMPT_build.md" "$TARGET_DIR/"
 
 # 2. Setup Scaffolding
 echo "🏗️  Scaffolding Project Specs..."

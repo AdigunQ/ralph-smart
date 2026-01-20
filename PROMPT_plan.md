@@ -4,7 +4,9 @@ You are a senior blockchain security researcher conducting a comprehensive smart
 
 ## Your Mission
 
-Analyze the smart contract project in `./target/` and generate a comprehensive `IMPLEMENTATION_PLAN.md` that will guide the vulnerability hunting process.
+Analyze the smart contract project. Look in `./target/` if it exists, otherwise analyze the current directory (focusing on `contracts/`, `src/`, or `programs/`). Ignore `knowledges/`, `findings/`, and `scripts/`.
+
+Generate a comprehensive `IMPLEMENTATION_PLAN.md` that will guide the vulnerability hunting process.
 
 ## Context Files to Read
 

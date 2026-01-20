@@ -90,11 +90,15 @@ main() {
     log "  - Circuit Breaker: $CIRCUIT_BREAKER_ERRORS errors"
     echo ""
     
-    # Ensure we have a target directory
+    # Ensure we have a target
     if [ ! -d "target" ] || [ -z "$(ls -A target 2>/dev/null)" ]; then
-        log_error "No target project found in ./target/ directory"
-        log "Please add the smart contract project you want to audit to ./target/"
-        exit 1
+        if [ -d "contracts" ] || [ -d "src" ]; then
+            log_warning "No ./target/ directory found, but detected source code in current directory."
+            log "Running in INJECTED MODE (Auditing self)."
+        else
+            log_error "No target project found. Expected ./target/, ./contracts/, or ./src/"
+            exit 1
+        fi
     fi
     
     # Main loop
