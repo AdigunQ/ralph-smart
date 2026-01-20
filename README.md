@@ -18,6 +18,7 @@ while :; do cat PROMPT.md | claude-code ; done
 
 - 🔄 **Autonomous loop** until all checks complete
 - 🧠 **Possibility space construction** (generate hypotheses → validate → converge)
+- 🐕 **Hound Methodology** (deep reasoning via mental maps & junior/senior agent models)
 - 📋 **6 Taint Model templates** for systematic coverage
 - ✅ **Rigorous validation** to filter false positives
 - 📝 **Auto-generated PoCs** for confirmed vulnerabilities
