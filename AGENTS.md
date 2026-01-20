@@ -119,6 +119,26 @@ cd target && aptos move test
 4. **Document Everything**: Future iterations need context
 5. **Commit Often**: Git tracks your investigation progress
 
+## Operational Safety (Flow State)
+
+**Philosophy**: "Speed without Fear."
+We run with `dangerously-skip-permissions` enabled, but protected by **Hooks**.
+
+**The Safety Hook (`safety_check.sh`)**:
+Before any command execution, the hook validates the intent.
+
+- **Allowed**: `mkdir`, `touch`, `forge`, `grep`.
+- **BLOCKED**: `rm -rf /`, `export PRIVATE_KEY`, `git push --force`.
+
+**Agent Directive**:
+If the hook blocks your action:
+
+1.  **Do NOT bypass it**.
+2.  **Analyze why**: Am I trying to delete root?
+3.  **Correct course**: Use a safer command.
+
+---
+
 ## Meta-Learning (Failure Analysis)
 
 **"Reconstruct the Input-Output Loop"**: Agentic coding often hides why things fail. To improve, we must expose the failure loop.
