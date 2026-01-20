@@ -419,6 +419,49 @@ Focus on helping me *run the protocol in my head* with my eyes closed.
 
 ---
 
+## Incorporating the Hound Methodology
+
+While deep reading is about the "how" (line-by-line), the **Hound Methodology** gives you the "what" (modeling the system).
+
+> **Core Philosophy**: "Shallow reasoning misses bugs ... deep reasoning turns a few steps into the right ones." — Bernhard Mueller
+
+### 1. Build "Mental Maps" (Not just notes)
+
+Don't just list functions. Build dynamic knowledge graphs in your notes:
+
+- **Authorization Graph**: Who can call what?
+- **State Flow Graph**: How does `totalAssets` flow through `deposit` -> `strategy` -> `withdraw`?
+- **Vesting Lifecycle Graph**: How does a position change over time?
+
+### 2. The "Junior" vs "Senior" Technique
+
+Split your brain into two modes:
+
+**The Junior (Explorer)**
+
+- Reads code line-by-line (Deep Reading Phase).
+- Annotates observations: _"This function updates `releaseRate` based on `totalTime`."_
+- Does NOT look for bugs, just records facts.
+
+**The Senior (Hypothesizer)**
+
+- Reviews the Junior's notes.
+- Looks for **contradictions**.
+- Asks: _"The Junior noted that `totalTime` can fit in uint64, but the math uses uint256. Is there a precision loss or truncation risk if we mix types?"_
+- Formulates **Focused Hypotheses**: _"If I transfer 1 wei of vesting, the rate recalculation rounds down to 0, locking the remaining funds."_
+
+### 3. Track Invariants as You Read
+
+As you read, write down "beliefs" about the system:
+
+- _"Belief: The sum of user balances must always equal total supply."_
+- _"Belief: Only the Admin can pause."_
+- _"Belief: Fees are calculated before the transfer."_
+
+When you see code that contradicts a belief... **THAT is a bug**.
+
+---
+
 ## Timeline
 
 A proper deep read of 1000 lines of code takes **4-8 hours**.
