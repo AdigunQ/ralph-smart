@@ -133,6 +133,15 @@ _Refer to `MANUAL_AUDIT_DEEP_READING.md` for specific hunting techniques._
 
 To run a workflow, simply ask the agent: _"Run /hound on this target"_ or _"Run /verify on this PoC"_.
 
+### 🧠 Advanced Mastery
+
+We have integrated the **Claude Code Mastery Guide** into this repository.
+See [`knowledges/claude_code_mastery.md`](knowledges/claude_code_mastery.md) for patterns on:
+
+- **Context Engineering** (Preventing "Context Rot")
+- **Error Logging** (Reconstructing the Failure Loop)
+- **Subagent Control** (Forcing Opus for reasoning)
+
 ---
 
 ## 🚀 Execution Instructions
