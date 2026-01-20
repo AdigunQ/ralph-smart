@@ -121,7 +121,18 @@ ralph-security-researcher/
    - Validate each hypothesis (forward scan: rigorous proof)
    - Create PoC for confirmed bugs
    - Mark check complete
+
+### Combined Approach
+
+1. **Planning Phase**: Analyze target, create systematic checklist using 6 taint models
+2. **Building Phase**: For each check:
+   - Generate 3-5 vulnerability hypotheses (reverse scan: "There IS a bug here")
+   - Validate each hypothesis (forward scan: rigorous proof)
+   - Create PoC for confirmed bugs
+   - Mark check complete
 3. **Automatic Exit**: When all checks done or max iterations reached
+
+See `knowledges/hound_methodology.md` for deep reasoning techniques.
 
 ## 📊 The 6 Taint Models
 
