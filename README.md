@@ -175,6 +175,44 @@ cat specs/spec_template.md > specs/my_audit.md
 
 ---
 
+## 📦 Usage in External Audits (Portable Mode)
+
+To use Ralph's capabilities (TDD Loops, Knowledge Base, Slash Commands) in a **target codebase** you are auditing:
+
+### Option A: Full Integration (Recommended)
+
+This injects the full agentic brain into the target repo.
+
+1.  **Clone Ralph** into a temp folder:
+    ```bash
+    git clone https://github.com/your-repo/ralph-security-researcher.git /tmp/ralph
+    ```
+2.  **Copy Critical Core**:
+    ```bash
+    cp -r /tmp/ralph/{.agent,knowledges,scripts,CLAUDE.md,AGENTS.md,CODE_INDEX.md} .
+    ```
+3.  **Install Hooks** (Enforces 20/200 Rule):
+    ```bash
+    ./scripts/install_hooks.sh
+    ```
+4.  **Audit!**:
+    - Use `/hound` to map the target.
+    - Use `/tdd` to write PoCs.
+    - Use `/audit` to run the autonomous loop.
+
+### Option B: Reference Mode (Non-Intrusive)
+
+If you cannot modify the target repo structure:
+
+1.  **Clone as Subfolder**:
+    ```bash
+    git clone https://github.com/your-repo/ralph-security-researcher.git ralph
+    ```
+2.  **Instruct Your Agent**:
+    > "I have loaded the Ralph framework in the `ralph/` directory. Use `ralph/knowledges/` for patterns and `ralph/scripts/` for analysis."
+
+---
+
 ## ⚠️ Core Directives
 
 1. **Hallucinate to Explore**: It is acceptable to propose wrong hypotheses initially (Finite Monkey).
