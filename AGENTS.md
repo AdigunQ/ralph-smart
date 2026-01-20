@@ -4,6 +4,16 @@
 
 Hunt blockchain & smart contract vulnerabilities using Ralph's autonomous loop + finite-monkey's possibility space methodology.
 
+## Allowed Agents
+
+- Gemini 3 Pro (High)
+- Gemini 3 Pro (Low)
+- Gemini 3 Flash New
+- Claude Sonnet 4.5
+- Claude Sonnet 4.5 (Thinking)
+- Claude Opus 4.5 (Thinking)
+- GPT-OSS 120B (Medium)
+
 ## Workflow Phases
 
 ### Phase 1: PLANNING (First iteration)

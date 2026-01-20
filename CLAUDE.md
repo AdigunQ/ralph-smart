@@ -9,8 +9,14 @@
 
 ## 2. Model Preferences
 
-- **Knowledge/Reasoning Tasks**: `claude-3-opus`
-- **Coding/Execution Tasks**: `claude-3-sonnet` or `claude-3.5-sonnet` (if available)
+- **Allowed Models**:
+  - Gemini 3 Pro (High)
+  - Gemini 3 Pro (Low)
+  - Gemini 3 Flash New
+  - Claude Sonnet 4.5
+  - Claude Sonnet 4.5 (Thinking)
+  - Claude Opus 4.5 (Thinking)
+  - GPT-OSS 120B (Medium)
 
 ## 3. Orchestrator Mindset
 
