@@ -139,6 +139,22 @@ If the hook blocks your action:
 
 ---
 
+## Orchestrator Architecture (Subagents)
+
+**Directive**: "Orchestrator + Subagents >> Claude Code vanilla."
+**Subagent Rule**: Use subagents way more than you think.
+
+**When to Spawn a Subagent (`browser_subagent` or `run_command` loop)**:
+
+1.  **Deep Knowledge Retrieval**: "Read all 50 files in `knowledges/` and summarize patterns." -> **Spawn Opus**.
+2.  **Complex Reasoning**: "Build the 4 Hound Graphs for this protocol." -> **Spawn Opus**.
+3.  **Massive Refactors**: "Rename this variable in 20 files." -> **Spawn Sonnet**.
+
+**The Mindset**:
+You are not just a worker; you are a **Manager**. Break the task down, assign it to a subagent (if available in your toolset), and review the output.
+
+---
+
 ## Meta-Learning (Failure Analysis)
 
 **"Reconstruct the Input-Output Loop"**: Agentic coding often hides why things fail. To improve, we must expose the failure loop.
