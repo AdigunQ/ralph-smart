@@ -9,12 +9,13 @@
 
 Choose your operating mode based on the user's request and the complexity of the target.
 
-| Mode                | Trigger Condition                                   | Methodology             | Key Resource                      |
-| ------------------- | --------------------------------------------------- | ----------------------- | --------------------------------- |
-| **Autonomous Loop** | "Run audit", "Find bugs automatically"              | **Ralph Loop**          | `./loop.sh`                       |
-| **Deep Reasoning**  | "Understand the protocol", "Complex logic analysis" | **Hound**               | `knowledges/hound_methodology.md` |
-| **Line-by-Line**    | "Manual review", "Deep read", "Check specifically"  | **Manual Deep Reading** | `MANUAL_AUDIT_DEEP_READING.md`    |
-| **Exploration**     | "Hallucinate bugs", "What if..."                    | **Finite Monkey**       | `knowledges/finite_monkey.md`     |
+| Mode                  | Trigger Condition                                   | Methodology             | Key Resource                         |
+| --------------------- | --------------------------------------------------- | ----------------------- | ------------------------------------ |
+| **Autonomous Loop**   | "Run audit", "Find bugs automatically"              | **Ralph Loop**          | `./loop.sh`                          |
+| **Deep Reasoning**    | "Understand the protocol", "Complex logic analysis" | **Hound (Research)**    | `knowledges/hound_methodology.md`    |
+| **Math & Invariants** | "Check formulas", "AMM/Lending logic"               | **Security Math**       | `knowledges/security_math_primer.md` |
+| **Line-by-Line**      | "Manual review", "Deep read", "Check specifically"  | **Manual Deep Reading** | `MANUAL_AUDIT_DEEP_READING.md`       |
+| **Exploration**       | "Hallucinate bugs", "What if..."                    | **Finite Monkey**       | `knowledges/finite_monkey.md`        |
 
 ---
 
@@ -28,6 +29,7 @@ You have access to a specialized security library in `knowledges/`. Use it exten
 
 - **General DeFi**: `knowledges/security_primer.md` (370+ patterns)
 - **Vaults/ERC4626**: `knowledges/erc4626_security_primer.md` (366 patterns)
+- **Math & Logic**: `knowledges/security_math_primer.md` (Linearization, Matrices, Groups)
 - **Historical Findings**: `knowledges/solodit/reports/` (575 audit reports)
 
 **Command Examples**:
@@ -55,23 +57,38 @@ grep -r "liquidation" knowledges/solodit/reports/
 
 ## 🐕 Hound Methodology (Deep Reasoning)
 
-**CONTEXT**: For complex system analysis, do not just scan code. Build a mental model.
+**CONTEXT**: For complex system analysis, utilize **Relation-First Graphs** and **Persistent Beliefs**.
 
-### Agent Roles
+### Agent Roles (Simulate these mental modes)
 
-1. **Junior (Explorer)**: Read code, annotate facts, map call graphs. "What does this do?"
-2. **Senior (Hypothesizer)**: Review annotations, find contradictions, propose bugs. "Why is this broken?"
+1. **Scout (Junior)**: Map the territory. "Observation: Function X updates variable Y."
+2. **Strategist (Senior)**: Find contradictions. "Hypothesis: Invariant Z is violated by X."
+3. **Finalizer (QA)**: Prove it. "Confirmation: PoC passes."
 
-### Required Mental Maps
+### Required Mental Maps (Relation-First Graphs)
 
-Construct these graphs in your context window or scratchpad:
+Construct these graphs to anchor your reasoning:
 
-1. **SystemArchitecture**: Components & Interfaces.
-2. **AssetAndFeeFlows**: Where money moves.
-3. **CrossContractCalls**: Interaction graph.
-4. **StateMutationMap**: Who changes what state.
+1. **SystemArchitecture**: High-level components & interfaces.
+2. **AssetAndFeeFlows**: Token/value movement during listing, purchase, vesting.
+3. **StateMutationMap**: Key storage variables and who mutates them.
+4. **AuthorizationRoles**: Access control graph.
 
-_Refer to `knowledges/hound_methodology.md` for the full protocol._
+_Refer to `knowledges/hound_methodology.md` for the full Research-Grade protocol (arXiv:2510.09633v1)._
+
+---
+
+## 📐 Mathematical Thinking (Security Math)
+
+**CONTEXT**: When analyzing DEFI logic (AMMs, Lending, Perps).
+
+**DIRECTIVES**:
+
+1. **Linearize Invariants**: Use Logarithms to turn `x * y = k` into linear equations.
+2. **Matrix Solvency**: Model risk engines as `C * P * p >= m`.
+3. **Verify ZK**: Check R1CS constraint matrices.
+
+_Refer to `knowledges/security_math_primer.md` for the guide._
 
 ---
 
