@@ -68,6 +68,27 @@ Keep track of what failed.
 
 **Do not re-propose refuted hypotheses.**
 
+## 6. Mutation Testing (Coverage Counter-Measures)
+
+**"Testing Coverage Fallacy"**: A high number of passing tests means nothing if the tests don't actually check the logic.
+
+> **Directive**: Whenever you write a PoC test, you MUST mutate it to ensure it fails when it should.
+
+### The Protocol
+
+1.  **Write the Test**: Create a test that reproduces the bug (should fail).
+2.  **Verify Failure**: Run it. If it passes (i.e., detects no bug), your test is broken.
+3.  **Mutate the Code**:
+    - Temporarily _fix_ the bug in the contract (or comment out the vulnerable line).
+    - Run the test again.
+    - **Crucial Step**: The test must now **PASS** (confirming no bug).
+4.  **Mutate the Test**:
+    - Change the assertion values.
+    - Run again.
+    - **Crucial Step**: The test must now **FAIL** or behave differently.
+
+**If your test passes regardless of whether the bug is present or fixed, it is a FALSE POSITIVE.**
+
 ## Summary Checklist
 
 Before hitting "Report":
@@ -76,5 +97,6 @@ Before hitting "Report":
 - [ ] Is there a localized code slice proving it?
 - [ ] Did the "Hostile Senior" fail to debunk it?
 - [ ] (Bonus) Is there a PoC?
+- [ ] **Did you mutate the test to prove it's not a dummy?**
 
 **"Silence is better than Noise."**
