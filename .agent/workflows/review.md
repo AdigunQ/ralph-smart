@@ -10,10 +10,13 @@ argument-hint: [file-or-dir]
 
 ## 1. Complexity Check (The 20/200 Rule)
 
-- [ ] Any file > 200 lines? -> **FAIL** (Split it)
-- [ ] Any function > 20 lines? -> **FAIL** (Decompose it)
-- [ ] Any function params > 3? -> **WARN** (Use object)
-- [ ] Nesting > 2 levels? -> **FAIL** (Flatten)
+**Action**: Running automated enforcement script...
+
+```bash
+python3 scripts/enforce_complexity.py
+```
+
+_(If this script fails, you MUST refactor before proceeding.)_
 
 ## 2. Security Check
 
