@@ -460,6 +460,30 @@ When you see code that contradicts a belief... **THAT is a bug**.
 
 ---
 
+## 4. Mathematical Thinking (Get Math-Pilled)
+
+For complex DeFi (AMMs, Lending, Perps), code reading is not enough. You need **Math**.
+
+> "If you want to see the matrix, you need to get math-pilled." — Bernhard Mueller
+
+**Reference**: `knowledges/security_math_primer.md`
+
+### When to use Math vs Code?
+
+| Scenario              | Tool                | Technique                                                                          |
+| --------------------- | ------------------- | ---------------------------------------------------------------------------------- |
+| **AMM Invariant**     | Excel / Spreadsheet | **Linearize it**: Transform $x \cdot y = k$ using logs into linear equations.      |
+| **Lending Solvency**  | Matrix Operations   | **Matrix Inequality**: $C \cdot (P \cdot p) \ge m$. Check if rounding accumulates. |
+| **ZK Circuits**       | Linear Algebra      | **R1CS**: Verify constraint matrices.                                              |
+| **Symmetry Breaking** | Group Theory        | **Homomorphisms**: Does $Commit(A) + Commit(B) = Commit(A+B)$ hold?                |
+
+**Actionable Advice**:
+
+- If you see `x * y` or `x / y` in a loop or invariant check -> **Open a Spreadsheet**.
+- Don't guess if the math holds. **Prove it**.
+
+---
+
 ## Timeline
 
 A proper deep read of 1000 lines of code takes **4-8 hours**.
