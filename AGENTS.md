@@ -118,3 +118,25 @@ cd target && aptos move test
 3. **Validate Ruthlessly**: Most hypotheses will be false positives - that's expected
 4. **Document Everything**: Future iterations need context
 5. **Commit Often**: Git tracks your investigation progress
+
+## Meta-Learning (Failure Analysis)
+
+**"Reconstruct the Input-Output Loop"**: Agentic coding often hides why things fail. To improve, we must expose the failure loop.
+
+**Protocol**:
+Cuando something fails (a finding is rejected, a test fails to compile, or the agent gets stuck):
+
+1.  **Log the Exact Failure Trigger**:
+    - What was the exact prompt?
+    - What was the context (files open)?
+    - What was the erroneous output?
+2.  **Categorize the Failure**:
+    - `Context Blindness` (Didn't read the file)
+    - `Hallucination` (Invented a function)
+    - `Logical Fallacy` (Bad math/reasoning)
+    - `Tool Misuse` (Wrong grep arguments)
+3.  **Root Cause Analysis**:
+    - Ask: _"What did I do wrong?"_
+    - _Self-Correction_: "I should have verified `token.decimals()` before assuming 18."
+
+**Patterns emerge when you log 10+ failures. Use these patterns to update `knowledges/` guidelines.**
