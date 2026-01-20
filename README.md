@@ -146,6 +146,120 @@ Each model has:
 
 See `knowledges/taint_models/` for detailed guides.
 
+## 🔎 Using the Knowledge Base with LLMs
+
+The `knowledges/` folder contains a rich library of security patterns, audit reports, and taint models. Here's how to instruct your LLM to leverage this knowledge during audits.
+
+### Knowledge Base Structure
+
+```
+knowledges/
+├── security_primer.md          # 370+ vulnerability patterns
+├── erc4626_security_primer.md  # 366 vault-specific patterns
+├── taint_models/               # 6 systematic analysis frameworks
+├── vulnerability_patterns/     # Common attack patterns
+└── solodit/                    # 575 real audit reports
+    └── reports/
+        ├── Cyfrin/
+        ├── Pashov Audit Group/
+        ├── Trust Security/
+        └── ... (17 security firms)
+```
+
+### Example LLM Prompts
+
+#### 1. Pattern Matching Against Known Vulnerabilities
+
+```
+Read `knowledges/security_primer.md` and check if any of the
+vulnerability patterns apply to the `withdraw()` function in
+`contracts/Vault.sol`.
+
+For each matching pattern, explain:
+1. Which pattern matches
+2. Where in the code it applies
+3. How to exploit it
+```
+
+#### 2. Search Similar Audit Reports
+
+```
+Search `knowledges/solodit/reports/` for audits of lending protocols.
+Find any findings related to "liquidation" or "collateral ratio".
+Apply those findings to analyze the liquidation logic in our target
+contract at `target/contracts/LendingPool.sol`.
+```
+
+#### 3. Apply Taint Model Framework
+
+```
+Read `knowledges/taint_models/invariant.md` and apply its
+SOURCE → SINK → SANITIZER framework to the accounting logic in
+`target/contracts/Pool.sol`.
+
+Generate 3 hypotheses about broken invariants, then validate each one.
+```
+
+#### 4. Cross-Reference with ERC4626 Patterns
+
+```
+Our target implements an ERC4626 vault. Read
+`knowledges/erc4626_security_primer.md` and check for:
+1. First depositor attack mitigations
+2. Share price manipulation vectors
+3. Rounding direction issues
+
+Report any patterns that match our implementation.
+```
+
+#### 5. Full Audit with Knowledge Integration
+
+```
+You are auditing `target/contracts/`. Before analyzing each function:
+
+1. Check `knowledges/vulnerability_patterns/` for matching patterns
+2. Search `knowledges/solodit/reports/` for similar protocol audits
+3. Apply the relevant taint model from `knowledges/taint_models/`
+4. Reference `knowledges/security_primer.md` for edge cases
+
+Document all matches and create PoCs for confirmed vulnerabilities.
+```
+
+### Search Commands for Knowledge Base
+
+Use these commands to find relevant knowledge:
+
+```bash
+# Find all vault-related findings
+grep -r "vault" knowledges/solodit/reports/ --include="*.md"
+
+# Find reentrancy patterns
+grep -r "reentrancy" knowledges/ --include="*.md"
+
+# Find all Critical/High findings from Cyfrin
+grep -r "Critical\|High" knowledges/solodit/reports/Cyfrin/
+
+# List all audit reports for lending protocols
+ls knowledges/solodit/reports/*/ | xargs grep -l "lending\|borrow"
+```
+
+### Integrating Knowledge into PROMPT Files
+
+Add this context to your `PROMPT_build.md`:
+
+```markdown
+## Knowledge Base Context
+
+Before analyzing each function, reference:
+
+- `knowledges/security_primer.md` for vulnerability patterns
+- `knowledges/taint_models/[relevant].md` for the analysis framework
+- `knowledges/solodit/reports/` for similar protocol audits
+
+Search for patterns matching the function's behavior and apply
+lessons from historical audits.
+```
+
 ## ⚙️ Configuration
 
 Edit `loop.sh` or set environment variables:
