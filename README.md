@@ -92,6 +92,20 @@ _Refer to `knowledges/security_math_primer.md` for the guide._
 
 ---
 
+## 🛡️ False Positive Prevention Protocol
+
+**CONTEXT**: "It is better to miss a bug than to report a hallucination."
+
+**DIRECTIVES**:
+
+1. **Confidence Threshold**: Findings with confidence < 0.8 are discarded.
+2. **PoC Gate**: High severity bugs MUST have a failing test case.
+3. **The Skeptic**: The Senior agent must try to _disprove_ the finding.
+
+_Refer to `knowledges/false_positive_prevention.md` for the full gatekeeping protocol._
+
+---
+
 ## 📖 Manual Deep Reading Protocol
 
 **CONTEXT**: When asked to "read carefully" or "manual audit".
