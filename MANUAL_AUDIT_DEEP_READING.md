@@ -353,6 +353,72 @@ Review your notes later. Many will be false alarms. Some won't.
 
 ---
 
+## Building the Mental Map
+
+Have you ever felt like you understand each contract, but you can't make the bigger picture? You can't see where the money flows, or you don't understand the whole purpose of this protocol?
+
+Worry not. Here is a prompt that will help you build a mental map of the whole protocol in your head so you can remember it easily. 🫡
+
+### The Mental Map Prompt
+
+Use this with your LLM to get a complete end-to-end understanding:
+
+```
+Help me build a complete mental map of this protocol so I can visualize it end-to-end.
+
+Do NOT explain contracts in isolation.
+Explain the protocol in terms of flows.
+
+Structure the explanation as follows:
+
+1. Actors:
+   - Who are the main actors? (users, admins, keepers, bots, external protocols)
+   - What each actor is trying to achieve
+
+2. Primary user flows (money-first):
+   - Describe the main things a user can do, in chronological order
+   - For each flow, follow the user's funds step by step:
+     - Where the money starts
+     - Which contracts it passes through
+     - Where it ends up
+     - Who controls it at each step
+
+3. Contract orchestration:
+   - For each flow, list which contracts participate
+   - Describe each contract's role using one sentence only
+   - Emphasize *why* the contract exists in the flow
+
+4. State progression:
+   - What high-level protocol state changes as flows execute?
+   - How the protocol moves from "before user action" to "after user action"
+
+5. External integrations:
+   - Identify all external systems (DEXs, oracles, automation, bridges, ERC standards)
+   - Explain:
+     - Why the protocol depends on them
+     - When they are invoked
+     - What assumptions are made about them
+
+6. Full protocol walkthrough:
+   - Narrate a complete, realistic scenario:
+     - User enters the protocol
+     - Uses its core functionality
+     - Money moves
+     - External systems interact
+     - Protocol reaches a stable end state
+
+Focus on helping me *run the protocol in my head* with my eyes closed.
+```
+
+### When to Use This
+
+- **Before starting deep reading**: Get the big picture first
+- **When you feel lost**: Reset your understanding
+- **After reading all contracts**: Verify your mental model is correct
+- **Before hunting for bugs**: Know where the money is
+
+---
+
 ## Timeline
 
 A proper deep read of 1000 lines of code takes **4-8 hours**.
