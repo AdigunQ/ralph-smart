@@ -427,11 +427,14 @@ While deep reading is about the "how" (line-by-line), the **Hound Methodology** 
 
 ### 1. Build "Mental Maps" (Not just notes)
 
-Don't just list functions. Build dynamic knowledge graphs in your notes:
+Don't just list functions. Build dynamic knowledge graphs for clear perspectives. Recommended graphs:
 
-- **Authorization Graph**: Who can call what?
-- **State Flow Graph**: How does `totalAssets` flow through `deposit` -> `strategy` -> `withdraw`?
-- **Vesting Lifecycle Graph**: How does a position change over time?
+| Graph                  | Focus                                                                                                                                                                               |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SystemArchitecture** | High-level components, contracts, and external interfaces with their interactions and core data/control flows for listing, purchasing, vesting, whitelisting, and fee management    |
+| **AssetAndFeeFlows**   | Token/value movement during lifecycle events: funding vestings, listing, purchase settlement (buyer/seller/referral/feeCollector), early delist penalty, and vesting transfer/claim |
+| **CrossContractCalls** | Inter-contract call graph showing which functions in each contract invoke external functions in other contracts across the main flows (list, purchase, delist, deploy, whitelist)   |
+| **StateMutationMap**   | Key storage variables/mappings in each contract and the functions that mutate them, highlighting cross-contract state effects (allocations, listings, vestings, fees, whitelists)   |
 
 ### 2. The "Junior" vs "Senior" Technique
 
