@@ -21,6 +21,132 @@ You are sitting with a cup of coffee, reading someone else's code as if your rep
 
 ---
 
+## The Skeptic's Lens
+
+**Be wary of everything. Even when it looks correct.**
+
+The most dangerous bugs are in code that "obviously works". The developer was confident. The tests pass. It looks fine.
+
+But you are not here to confirm it works. You are here to find where it doesn't.
+
+### The Inquisitive Mindset
+
+For **every line**, ask:
+
+- _"Why is it done this way?"_
+- _"What assumption is the developer making here?"_
+- _"What if that assumption is wrong?"_
+
+Even for simple operations:
+
+```solidity
+balance += amount;
+```
+
+Ask:
+
+- Why `+=` and not `=`?
+- Could `balance` already have a value we don't expect?
+- Could `amount` be manipulated before this line?
+- Is this the right `balance`? (storage vs memory? which mapping key?)
+
+### Never Trust "Obvious" Code
+
+```solidity
+require(msg.sender == owner, "Not owner");
+```
+
+This looks correct. But ask:
+
+- How is `owner` set? Can it be changed?
+- Could `owner` be address(0)?
+- Is there another path that bypasses this check?
+- Could someone front-run the owner to become the owner?
+
+### Question Every Action
+
+| Code Pattern    | Inquisitive Questions                           |
+| --------------- | ----------------------------------------------- |
+| `a = b`         | Is `b` validated? Could it be stale?            |
+| `if (x > y)`    | Should it be `>=`? What if `x == y`?            |
+| `call external` | Could it revert? Reenter? Return false?         |
+| `emit Event`    | Does the event match the actual state change?   |
+| `return value`  | Is this the right value? What about edge cases? |
+
+### The Uncomfortable Truth
+
+Most code you read will be correct. But you must treat every line as suspect until proven otherwise.
+
+The bug finder's paradox:
+
+> _"You must believe the code is broken to find the break, but most code isn't broken."_
+
+Stay paranoid. Stay inquisitive.
+
+---
+
+## Targeted Hunting
+
+**Don't dive into a random line of code and hope for the best.**
+
+### Step 1: List Every Entry Point
+
+Before reading any function body, enumerate every way a user can interact with the system:
+
+- Every `external` function
+- Every `public` function
+- Every callback or hook
+- Every receive/fallback handler
+
+Write them down. This is your attack surface map.
+
+### Step 2: Trace Call Flows Systematically
+
+Go through entry points **one at a time**. For each one:
+
+1. Read the function signature
+2. Trace the call flow in your head (or use your note-taking system)
+3. Follow every internal function call
+4. Track every state change
+5. Note every external interaction
+
+Don't jump around. Finish one entry point completely before moving to the next.
+
+### Step 3: Hunt with Purpose
+
+**Don't just read for the sake of it.**
+
+Pick a **target impact** first:
+
+- Stealing funds
+- Crashing a node (panic, unhandled exception)
+- Griefing other users
+- Bypassing access control
+- Manipulating prices/oracles
+
+Then pick a **mechanism** to achieve it:
+
+- Integer overflow/underflow
+- Reentrancy
+- Unvalidated input
+- Missing access check
+- Logic flaw in state transition
+
+As you dissect each entry point, **hunt specifically for those bugs**.
+
+Example hunting targets:
+
+| Impact          | Mechanism to Hunt                                |
+| --------------- | ------------------------------------------------ |
+| Drain funds     | Reentrancy, rounding errors, unchecked returns   |
+| Crash node      | Panic, infinite loop, out of gas, stack overflow |
+| Steal NFT       | Missing ownership check, signature replay        |
+| Manipulate vote | Flash loan governance, double voting             |
+
+**Reading with intent finds more bugs than passive reading.**
+
+---
+
 ## Phase 1: First Contact
 
 ### Read the Entry Point
