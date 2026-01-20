@@ -121,6 +121,20 @@ _Refer to `MANUAL_AUDIT_DEEP_READING.md` for specific hunting techniques._
 
 ---
 
+## ⚡ Workflows (Slash Commands)
+
+"SaaS-like workflows that are quick to run."
+
+| Command       | Action                  | Description                                                                |
+| :------------ | :---------------------- | :------------------------------------------------------------------------- |
+| **`/audit`**  | **Run Autonomous Loop** | Triggers `./loop.sh` to plan and execute a full audit.                     |
+| **`/hound`**  | **Deep Reasoning**      | Generates the 4 relation-first graphs and finds contradictions.            |
+| **`/verify`** | **Mutation Test**       | Validates a PoC by attempting to "fix" the bug and proving the test fails. |
+
+To run a workflow, simply ask the agent: _"Run /hound on this target"_ or _"Run /verify on this PoC"_.
+
+---
+
 ## 🚀 Execution Instructions
 
 ### To Run Autonomous Audit
