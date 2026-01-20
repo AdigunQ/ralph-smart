@@ -142,6 +142,14 @@ See [`knowledges/claude_code_mastery.md`](knowledges/claude_code_mastery.md) for
 - **Error Logging** (Reconstructing the Failure Loop)
 - **Subagent Control** (Forcing Opus for reasoning)
 
+### 🛡️ Bootstrap Security & TDD
+
+We also follow the **Claude Bootstrap** methodology (see [`knowledges/claude_bootstrap.md`](knowledges/claude_bootstrap.md)):
+
+- **`/tdd`**: The "Ralph Wiggum" Iterative Loop (Test -> Code -> Refactor).
+- **`/review`**: Enforces the **20 lines/function, 200 lines/file** limit.
+- **`/dedup`**: Prevents semantic duplication ("Check before write").
+
 ---
 
 ## 🚀 Execution Instructions
