@@ -339,20 +339,6 @@ After you understand the code, ask:
 
 ---
 
-## How to Document
-
-Don't write a formal report while reading. Just note:
-
-```
-Line 142: Unchecked arithmetic on user input. Could overflow?
-Line 256: External call before state update. Reentrancy?
-Line 301: Balance check uses < instead of <=. Off-by-one?
-```
-
-Review your notes later. Many will be false alarms. Some won't.
-
----
-
 ## Building the Mental Map
 
 Have you ever felt like you understand each contract, but you can't make the bigger picture? You can't see where the money flows, or you don't understand the whole purpose of this protocol?
@@ -419,47 +405,56 @@ Focus on helping me *run the protocol in my head* with my eyes closed.
 
 ---
 
-## Incorporating the Hound Methodology
+## Incorporating the Hound Methodology (Research Grade)
 
-While deep reading is about the "how" (line-by-line), the **Hound Methodology** gives you the "what" (modeling the system).
+While deep reading is about the "how" (line-by-line), the **Hound Methodology** (arXiv:2510.09633v1) gives you the "what" (modeling the system).
 
-> **Core Philosophy**: "Shallow reasoning misses bugs ... deep reasoning turns a few steps into the right ones." — Bernhard Mueller
+### 1. Build "Relation-First Graphs"
 
-### 1. Build "Mental Maps" (Not just notes)
+Human experts don't view code linearly. They build multiple, overlaying mental maps.
+Create these specific graphs in your notes:
 
-Don't just list functions. Build dynamic knowledge graphs for clear perspectives. Recommended graphs:
+| Graph                  | Focus                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| **AssetAndFeeFlows**   | Follow the money. Token movements during listing, purchase, vesting, claims. |
+| **AuthorizationRoles** | Who can call what? (Owner, Admin, User, Keeper).                             |
+| **StateMutationMap**   | Key storage variables and who mutates them.                                  |
+| **SystemArchitecture** | High-level component interactions.                                           |
 
-| Graph                  | Focus                                                                                                                                                                               |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **SystemArchitecture** | High-level components, contracts, and external interfaces with their interactions and core data/control flows for listing, purchasing, vesting, whitelisting, and fee management    |
-| **AssetAndFeeFlows**   | Token/value movement during lifecycle events: funding vestings, listing, purchase settlement (buyer/seller/referral/feeCollector), early delist penalty, and vesting transfer/claim |
-| **CrossContractCalls** | Inter-contract call graph showing which functions in each contract invoke external functions in other contracts across the main flows (list, purchase, delist, deploy, whitelist)   |
-| **StateMutationMap**   | Key storage variables/mappings in each contract and the functions that mutate them, highlighting cross-contract state effects (allocations, listings, vestings, fees, whitelists)   |
+> **Goal**: Enable "Exact Retrieval". When testing a function, look at these graphs to know _exactly_ which other components matter.
 
-### 2. The "Junior" vs "Senior" Technique
+### 2. The Agentic Roles Technique
 
-Split your brain into two modes:
+Split your brain into three distinct modes:
 
-**The Junior (Explorer)**
+**The Scout (Junior / Explorer)**
 
-- Reads code line-by-line (Deep Reading Phase).
-- Annotates observations: _"This function updates `releaseRate` based on `totalTime`."_
-- Does NOT look for bugs, just records facts.
+- **Goal**: Map the territory.
+- **Action**: Read code line-by-line.
+- **Output**: Annotations (Observations & Assumptions).
+- _"Observation: This function updates `releaseRate`."_
 
-**The Senior (Hypothesizer)**
+**The Strategist (Senior / Planner)**
 
-- Reviews the Junior's notes.
-- Looks for **contradictions**.
-- Asks: _"The Junior noted that `totalTime` can fit in uint64, but the math uses uint256. Is there a precision loss or truncation risk if we mix types?"_
-- Formulates **Focused Hypotheses**: _"If I transfer 1 wei of vesting, the rate recalculation rounds down to 0, locking the remaining funds."_
+- **Goal**: Find the bugs.
+- **Action**: Review Scout's notes for **Contradictions**.
+- **Output**: **Focused Hypotheses**.
+- _"Hypothesis (High Confidence): If I transfer 1 wei, rate rounds to 0."_
 
-### 3. Track Invariants as You Read
+**The Finalizer (QA)**
 
-As you read, write down "beliefs" about the system:
+- **Goal**: Prove it.
+- **Action**: Write the PoC.
+- **Output**: CONFIRMED or REJECTED verdict.
 
-- _"Belief: The sum of user balances must always equal total supply."_
-- _"Belief: Only the Admin can pause."_
-- _"Belief: Fees are calculated before the transfer."_
+### 3. Persistent Belief System
+
+Treat your hypotheses as long-lived objects, not fleeting thoughts.
+Track `Confidence (q)` from 0.0 to 1.0.
+
+1. **Propose**: "I think reentrancy is possible here." ($q=0.2$)
+2. **Investigate**: "Found a call before state update." ($q=0.6$)
+3. **Confirm**: "PoC crashes the contract." ($q=1.0$)
 
 When you see code that contradicts a belief... **THAT is a bug**.
 

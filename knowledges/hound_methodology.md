@@ -1,112 +1,129 @@
-# Hound Methodology: Deep Logic Bug Hunting
+# Hound Methodology: Relation-First Knowledge Graphs & Belief Systems
 
-> **Core Philosophy**: "Shallow reasoning misses bugs no matter how many guesses you make; deep reasoning turns a few steps into the right ones." — Bernhard Mueller
+> **Based on**: "Hound: Relation-First Knowledge Graphs for Complex-System Reasoning in Security Audits" (Muller, arXiv:2510.09633v1)
 
-This methodology focuses on simulating the cognitive processes of human experts: building flexible mental maps, tracking assumptions, and refining understanding as new evidence emerges.
+This methodology uses **Relation-First Graphs** to improve reasoning across interrelated components and a **Persistent Belief System** to track long-lived hypotheses.
 
-## 🧠Key Concepts
+## 🏗️ Core Architecture
 
-### 1. Dynamic Knowledge Graphs (Mental Maps)
+### 1. Relation-First Knowledge Graphs
 
-Human experts don't read code linearly. They build mental maps of:
+Expert auditors do not keep a frozen view of the system. They use flexible, analyst-defined graphs that capture abstract system aspects, anchored to exact code slices.
 
-- Components & call hierarchies
-- State & value flows
-- Authorization boundaries
-- Assumptions & Invariants
+**Key Graphs to Model:**
 
-**Action**: Model the system as a "living knowledge graph" rather than a flat file.
+- **SystemArchitecture**: High-level components & interfaces.
+- **AuthorizationRoles**: Who can call what (Authentication/Authorization).
+- **AssetAndFeeFlows**: Token/value movement during listing, purchase, vesting, claims.
+- **StateMutationMap**: Key storage variables and who mutates them.
+- **CallGraphs**: Inter-contract invocation paths.
 
-- **Node**: A function, role, or concept (e.g., "Vesting Lifecycle")
-- **Edge**: Relationships (calls, modifies, checks)
-- **Annotation**: "Fee <= 1000 bps", "Only owner can delist"
+> **Why?** Graphs enable **Exact Retrieval**. Instead of vector search (fuzzy), the agent follows typed edges to load _exactly_ the code needed (often across components).
 
-### 2. Hypothesis-Driven Auditing
+### 2. Persistent Belief System (Hypothesis Lifecycle)
 
-Better to generate **focused hypotheses** with deep reasoning than to spray thousands of shallow checks.
+Hypotheses are not transient thoughts. They are **First-Class Objects** that persist across sessions.
 
-- **Annotation**: Working assumptions based on evidence (cheap, easy to revise).
-  - _Example_: "releaseRate = amount / duration"
-- **Hypothesis**: Targeted, falsifiable claim about a vulnerability (expensive, high value).
-  - _Example_: "Transferring a vesting position recalculates releaseRate inconsistently, leading to token loss."
+**Hypothesis Fields:**
 
-### 3. The Junior/Senior Agent Model
+- **Title/Type**: "Reentrancy in withdraw"
+- **Severity**: High/Medium/Low
+- **Confidence ($q$)**: $0.0 - 1.0$
+- **Status**: `proposed` -> `investigating` -> `supported` -> `refuted` -> `confirmed/rejected`
+- **Evidence**: Linked graph nodes & code slices
 
-- **Junior (Agent)**:
-  - Navigates the graph & selects code slices.
-  - Annotates nodes with observations ("This function updates `totalAssets`").
-  - Escalates questions when stuck.
-- **Senior (Guidance)**:
-  - periodically reviews Junior's work.
-  - **Owns vulnerability hypothesis generation**.
-  - Proposes high-quality hypotheses based on contradictions in the graph.
+**Lifecycle:**
 
-## 🛠️ Execution Workflow
+1. **Strategies** proposes a hypothesis ($q=0.2$).
+2. **Scout** gathers evidence. evidence supports it ($q=0.6$, status=`supported`).
+3. **Strategist** realizes a check is missing ($q=0.8$).
+4. **Finalizer** (QA) confirms the exploit ($q=1.0$, status=`confirmed`).
 
-### Phase 1: Knowledge Graph Construction
+### 3. Two-Phase Planning
 
-Before hunting bugs, build the maps.
+Audits move through two distinct phases:
 
-1. **System Architecture Graph**: High-level component view.
-2. **Aspect Graphs**: Custom views for specific concerns (e.g., "Vesting Position Management", "Authorization Roles").
+**Phase A: Coverage (Sweep)**
 
-### Phase 2: Exploration & Annotation (The "Junior" Role)
+- **Goal**: Map components, fill the graph.
+- **Strategy**: Systematically visit unvisited nodes. Maximize node/card visitation.
+- **Focus**: Medium-granularity components.
 
-- **Investigate**: Pick a graph (e.g., Authorization).
-- **Annotate**: Attach observations to nodes.
-  - _Invariant_: "Step duration must divide total duration cleanly."
-  - _Assumption_: "Oracles never return 0."
-- **Contradiction Hunting**: When an observation conflicts with an invariant (e.g., a path that violates "releaseRate is stable"), a bug is likely hiding there.
+**Phase B: Intuition (Saliency)**
 
-### Phase 3: Hypothesis Formation (The "Senior" Role)
+- **Goal**: Deep dives on high-impact suspicions.
+- **Trigger**: Coverage > 90% ($p^* \approx 0.9$).
+- **Strategy**:
+  - **Saliency**: Contradictions between _Assumptions_ and _Observations_.
+  - **Value at Risk**: Components handling user funds.
+  - **Novelty**: Unexplored interaction paths.
 
-- Review the annotated graph.
-- Formulate a **Hypothesis**:
-  - **Root Cause**: What logic is broken?
-  - **Attack Vector**: How to trigger it?
-  - **Impact**: What happens?
-  - **Code References**: Exact lines.
-- **Confidence Rating**: distinct from annotations.
+## 🤖 Agent Roles
 
-### Phase 4: Quality Assurance
+| Role                    | Function                                                                     | Human Equivalent  |
+| ----------------------- | ---------------------------------------------------------------------------- | ----------------- |
+| **Strategist (Senior)** | Plans investigations. Proposes Hypotheses. Reviews evidence. "Why now?"      | Lead Auditor      |
+| **Scout (Junior)**      | Navigates graphs. Loads nodes/code. Annotates observations. "What is this?"  | Junior Auditor    |
+| **Finalizer (QA)**      | Reviews full source context of high-confidence hypotheses. Confirms/Rejects. | Quality Assurance |
 
-- **Filter**: Remove out-of-scope (gas, admin powers).
-- **Verify**: Does the code, as written, expose an exploitable path?
-  - _Proof_: Visible attack path.
-  - _Rejection_: Effective guard detected.
+## 🛠️ Execution Protocol
 
-## 💡 Practical Prompts
+### Step 1: Graph Discovery
 
-### "Mental Map" Construction
+Use the **Scout** to build the initial `SystemArchitecture`. Then define custom "Aspect Graphs" (e.g., `VestingLifecycle`).
+
+### Step 2: Annotation (The "Junior" Loop)
+
+Read code slices and attach typed annotations to nodes:
+
+- **Observation**: Fact about code ("Updates `totalAssets`").
+- **Assumption**: Expected invariant ("`totalAssets` should match sum of balances").
+
+### Step 3: Hypothesis Generation (The "Senior" Loop)
+
+The **Strategist** reviews annotations for **Contradictions**.
+
+- _Contradiction_: "Invariant says 'Rate is constant', Observation says 'Rate updated on transfer'."
+- _Action_: Propose Hypothesis: "Rate manipulation via transfer."
+
+### Step 4: Verification
+
+**Scout** loads _only_ the specific cards referenced by the Hypothesis.
+
+- Does the code prove the vulnerability?
+- Update Confidence ($q$).
+
+### Step 5: Finalization
+
+**Finalizer** reviews confirmed ($q>0.8$) hypotheses with full context.
+
+- Generates PoC if possible.
+- Writes final verdict.
+
+## 💡 Practical Prompts for Agents
+
+### "Deep Research" Mode (Graph Building)
 
 ```
-Help me build a mental map of [Component/Flow].
-Do not explain code in isolation.
-Identify:
-1. Actors & Goals
-2. Primary Money Flows (Step-by-step)
-3. Contract Orchestration (Roles & "Why")
-4. State Progression (Before -> After)
-5. External Assumptions
+Act as the Scout.
+Build an 'AssetAndFeeFlows' graph for the [Target Component].
+Nodes: Functions, State Variables.
+Edges: 'modifies', 'transfers_to', 'calculates_fee_for'.
+Annotate each node with:
+1. Observations (What it does)
+2. Assumptions (What must be true)
 ```
 
-### Invariant Annotation
+### "Intuition" Mode (Hypothesis Generation)
 
 ```
-Analyze this slice for invariants related to [Topic, e.g., Vesting].
-Note any:
-- Mathematical relationships (e.g., rate = amt/time)
-- State consistency rules
-- Access control assumptions
-Annotate the code with these observations.
-```
+Act as the Strategist.
+Review the 'AssetAndFeeFlows' graph.
+Look for contradictions between Assumptions and Observations.
+Focus on:
+1. Value at Risk (User funds)
+2. Inconsistent State Updates
+3. Missing Checks on Critical Paths
 
-### Hypothesis Generation
-
-```
-Review the annotations and code for [Component].
-Look for contradictions between:
-- The stated invariant "X"
-- The implementation of path "Y"
-Propose a falsifiable vulnerability hypothesis if a conflict exists.
+Propose 3 Focused Hypotheses with initial confidence scores.
 ```
