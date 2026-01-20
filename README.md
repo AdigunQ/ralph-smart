@@ -179,26 +179,23 @@ cat specs/spec_template.md > specs/my_audit.md
 
 To use Ralph's capabilities (TDD Loops, Knowledge Base, Slash Commands) in a **target codebase** you are auditing:
 
-### Option A: Full Integration (Recommended)
+### Option A: Automated Injection (Recommended)
 
-This injects the full agentic brain into the target repo.
+This injects the full agentic brain into the target repo with one command.
 
-1.  **Clone Ralph** into a temp folder:
+1.  **Run the Installer**:
+
     ```bash
-    git clone https://github.com/your-repo/ralph-security-researcher.git /tmp/ralph
+    # Assuming you have ralph cloned at ~/tools/ralph-security-researcher
+    ~/tools/ralph-security-researcher/install_agent.sh .
     ```
-2.  **Copy Critical Core**:
-    ```bash
-    cp -r /tmp/ralph/{.agent,knowledges,scripts,CLAUDE.md,AGENTS.md,CODE_INDEX.md} .
-    ```
-3.  **Install Hooks** (Enforces 20/200 Rule):
-    ```bash
-    ./scripts/install_hooks.sh
-    ```
-4.  **Audit!**:
-    - Use `/hound` to map the target.
-    - Use `/tdd` to write PoCs.
-    - Use `/audit` to run the autonomous loop.
+
+    _This will:_
+
+    - Copy `knowledges/`, `.agent/`, `scripts/`
+    - Install the **Complexity Enforcement Hooks**
+    - Initialize the `_project_specs/` directory
+    - Generate the initial `CODE_INDEX.md`
 
 ### Option B: Reference Mode (Non-Intrusive)
 
