@@ -1,0 +1,45 @@
+name: v2-task-lint
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  lint-v2-task-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Resolve changed paths
+        id: changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch origin "${{ github.base_ref }}" --depth=1
+            git diff --name-only "origin/${{ github.base_ref }}...HEAD" > /tmp/changed_paths.txt
+          elif [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            git diff --name-only "${{ github.event.before }}...${{ github.sha }}" > /tmp/changed_paths.txt
+          else
+            git ls-files > /tmp/changed_paths.txt
+          fi
+
+          if [ -s /tmp/changed_paths.txt ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Lint changed v2 task artifacts
+        if: steps.changes.outputs.has_changes == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t paths < /tmp/changed_paths.txt
+          scripts/lint_v2_tasks_from_paths.sh "${paths[@]}"

@@ -105,12 +105,60 @@ Document intentional design decisions:
 - "We use block.timestamp knowing miners can manipulate ±15 seconds"
 - "Admin has emergency pause power (centralization risk accepted)"
 
+## Verification Methodology
+
+This audit follows the 6-Step Verification Harness:
+
+1. **Observation** - Identifying anomalous code patterns
+2. **Reachability Analysis** - Can the vulnerable code be reached?
+3. **Controllability Assessment** - Can an attacker control the inputs?
+4. **Impact Quantification** - What's the maximum damage?
+5. **PoC Development** - Concrete exploit demonstration
+6. **Report Documentation** - Structured finding with fix recommendations
+
+### Pattern Matching Phase
+
+Before deep analysis, run pattern matching against Solodit's 50k+ vulnerability database:
+
+```bash
+python scripts/pattern_matcher.py /path/to/project --format report
+```
+
+This identifies historically similar vulnerabilities and provides context for findings.
+
+### Taint Model Application
+
+Apply all 6 taint models to each critical function:
+
+| Model | Focus | Key Question |
+|-------|-------|--------------|
+| **INV** | Invariants | What must always be true? |
+| **ASM** | Access Control | Who can call this? |
+| **EXP** | Oracle Manipulation | Where does price data come from? |
+| **TMP** | Timing/Ordering | Does order of operations matter? |
+| **CMP** | Complex Logic | Where are the edge cases? |
+| **BND** | Boundary Conditions | What are the limits? |
+
+### 5-Gate Verification
+
+Each finding must pass through 5 verification gates:
+
+1. ✅ **Syntactic** - Code pattern is actually suspicious
+2. ✅ **Semantic** - The logic flaw is real
+3. ✅ **Impact** - Severity is correctly assessed
+4. ✅ **Exploitability** - Attack path is feasible
+5. ✅ **Report Quality** - Documentation is complete
+
 ## Success Criteria
 
 Audit is considered complete when:
 
 - [ ] All CRITICAL areas thoroughly analyzed
 - [ ] 6 taint models applied to all in-scope contracts
-- [ ] All findings documented with PoCs
+- [ ] Pattern matching run and results reviewed
+- [ ] CodeQL baseline analysis completed (if applicable)
+- [ ] All findings pass 5-gate verification
+- [ ] All HIGH/CRITICAL findings have working PoCs
 - [ ] Report delivered with severity ratings
 - [ ] Recommendations provided for all issues
+- [ ] Fix validation completed (if applicable)

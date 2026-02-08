@@ -1,0 +1,2 @@
+https://docs.optimism.io/app-developers/bridging/messaging
+https://docs.optimism.io/stack/smart-contracts/smart-contracts#l2crossdomainmessenger

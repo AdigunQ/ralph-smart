@@ -1,0 +1,7 @@
+Snowbridge On-Chain Code bounty notes captured from user-provided program text (2026-02-06):
+
+- In-scope impacts: theft/loss of funds, unauthorized tx, tx manipulation, logic attacks, reentrancy, reordering, over/underflows.
+- Out of scope: theoretical-only without proof, old compiler/version lock issues, imported contract bugs, style/redundancy/gas-only issues, front-run-only exploitation, off-chain only code.
+- Explicit warning: do not report missing message.origin checks for V2 message handlers.
+- Additional requirement: include both Polkadot and Ethereum exploit analysis/PoC when vulnerability depends on both sides.
+- Reward bands: Critical $30k-$75k, High $6k-$20k, Medium $2k-$5k, Low $200-$1k.

@@ -1,0 +1,23 @@
+# Ralph Security Agent - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core dependencies
+requests>=2.31.0
+pyyaml>=6.0.1
+
+# Optional: For enhanced JSON handling
+jsonschema>=4.20.0
+
+# Optional: For data analysis capabilities
+pandas>=2.1.0
+numpy>=1.24.0
+
+# Optional: For markdown report generation
+markdown>=3.5.0
+
+# Development dependencies (optional)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.6.0

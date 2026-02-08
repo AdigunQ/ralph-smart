@@ -68,6 +68,8 @@ Keep track of what failed.
 
 **Do not re-propose refuted hypotheses.**
 
+**Default location**: `findings/negative_evidence.md`
+
 ## 6. Mutation Testing (Coverage Counter-Measures)
 
 **"Testing Coverage Fallacy"**: A high number of passing tests means nothing if the tests don't actually check the logic.
