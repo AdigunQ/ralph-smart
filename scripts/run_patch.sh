@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+RALPH_MODE=PATCH \
+STOP_ON_SUCCESS="${STOP_ON_SUCCESS:-true}" \
+SKIP_PRECHECK="${SKIP_PRECHECK:-true}" \
+ADAPTIVE_MODE="${ADAPTIVE_MODE:-false}" \
+./loop.sh "$@"

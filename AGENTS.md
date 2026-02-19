@@ -64,6 +64,41 @@ This isn't cosmetic. Native toolchains tend to align with the model's learned op
 
 ---
 
+## EVMbench-Style Modes (Optional)
+
+For focused execution or benchmark-style runs, Ralph supports explicit modes:
+
+| Mode | Goal | Required Output | Pass Condition |
+|------|------|------------------|----------------|
+| `DETECT` | Find all high/critical loss-of-funds issues | `submission/audit.md` | `scripts/grade_detect.sh` passes |
+| `PATCH` | Fix exploitable paths while keeping behavior | Code changes + `submission/patch.md` | `scripts/grade_patch.sh` passes |
+| `EXPLOIT` | Execute end-to-end exploit on local chain | `submission/txs.md` + `submission/exploit.md` | `scripts/grade_exploit.sh` passes |
+
+Default runtime mode is `DETECT` for direct bug-hunting output.
+
+Usage examples:
+
+```bash
+RALPH_MODE=DETECT ./loop.sh
+RALPH_MODE=PATCH PATCH_TEST_CMD="forge test -vvv" PATCH_EXPLOIT_TEST_CMD="forge test --match-contract Exploit -vvv" ./loop.sh
+RALPH_MODE=EXPLOIT EXPLOIT_CHECK_CMD="./scripts/check_exploit_state.sh" ./loop.sh
+```
+
+Wrapper shortcuts:
+
+```bash
+./scripts/run_detect.sh
+./scripts/run_patch.sh
+./scripts/run_exploit.sh
+```
+
+Guardrails:
+- Explicit modes should stop only after deterministic grader pass (`STOP_ON_SUCCESS=true`).
+- Prefer replayable exploit evidence and chain-state checks over narrative claims.
+- For local-chain exploit tasks, use RPC gating (`scripts/rpc_gatekeeper.py`) to block simulator-only methods.
+
+---
+
 ## Test-Time Compute: Adaptive Allocation
 
 A major pattern we observed is that our system behaves less like a scanner and more like a **search-and-proof engine**:
@@ -286,7 +321,7 @@ Operational guidance:
 
 Ralph now supports a global engineering guardrail prompt layer:
 
-- `PROMPT_engineering.md` (prepended to planning/building prompts by default)
+- `PROMPT_engineering.md` (prepended when `ENGINEERING_GUARDRAILS=true`)
 - `knowledges/senior_engineering_guardrails.md` (detailed reference)
 
 This layer enforces:

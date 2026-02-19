@@ -22,7 +22,7 @@ chmod +x loop.sh scripts/*.sh
 Recommended:
 
 ```bash
-COMPUTE_BUDGET=200 DOCS_DISCOVERY=true HARD_ENFORCEMENT=true ./loop.sh
+COMPUTE_BUDGET=200 HARD_ENFORCEMENT=true ./loop.sh
 ```
 
 Bug bounty mode:
@@ -43,7 +43,43 @@ Preset lean mode:
 LEAN_MODE=true ./loop.sh
 ```
 
+EVMbench-style explicit task modes:
+
+```bash
+RALPH_MODE=DETECT ./loop.sh
+RALPH_MODE=PATCH PATCH_TEST_CMD="forge test -vvv" PATCH_EXPLOIT_TEST_CMD="forge test --match-contract Exploit -vvv" ./loop.sh
+RALPH_MODE=EXPLOIT EXPLOIT_CHECK_CMD="./scripts/check_exploit_state.sh" ./loop.sh
+```
+
+Default mode is `DETECT` (high-signal bug hunting).
+
+Fast wrappers:
+
+```bash
+./scripts/run_detect.sh
+./scripts/run_patch.sh
+./scripts/run_exploit.sh
+```
+
+If Codex fails with repeated `stream disconnected` errors, verify outbound network access/auth for the Codex CLI environment.
+
 If your target is not in `./target/`, Ralph will fall back to current directory if it detects `contracts/` or `src/`.
+
+### Install CodeQL (once per machine/workspace)
+
+```bash
+./scripts/install_codeql.sh
+export PATH="$PWD/.tools/codeql:$PATH"
+```
+
+For a cloned repo on a fresh machine, run the same two commands once.
+
+One-command bootstrap for GitHub clones:
+
+```bash
+./scripts/bootstrap.sh
+export PATH="$PWD/.tools/codeql:$PATH"
+```
 
 ---
 
@@ -179,7 +215,17 @@ Needs-review ledger:
 | Command | Purpose |
 |---|---|
 | `./loop.sh` | Full autonomous audit loop |
+| `RALPH_MODE=DETECT ./loop.sh` | Detection-only run with detect grader gate |
+| `RALPH_MODE=PATCH ./loop.sh` | Patch-only run with test/exploit regression gate |
+| `RALPH_MODE=EXPLOIT ./loop.sh` | Exploit-only run with tx/state gate |
+| `./scripts/run_detect.sh` | Fast detect wrapper (recommended default) |
+| `./scripts/run_patch.sh` | Fast patch wrapper |
+| `./scripts/run_exploit.sh` | Fast exploit wrapper |
 | `./scripts/run_codeql_baseline.sh` | Deterministic baseline queries |
+| `./scripts/grade_detect.sh` | Deterministic detect grading |
+| `./scripts/grade_patch.sh` | Deterministic patch grading |
+| `./scripts/grade_exploit.sh` | Deterministic exploit grading |
+| `python3 scripts/rpc_gatekeeper.py --upstream <rpc>` | Block unsafe local-chain RPC methods |
 | `python3 scripts/update_code_index.py ...` | Target code index |
 | `python3 scripts/attack_surface.py ...` | Attack surface map |
 | `scripts/lint_task_result.sh ...` | Validate task result schema |
@@ -188,9 +234,7 @@ Needs-review ledger:
 | `scripts/migrate_to_v2.sh` | Backfill missing v2 artifacts for existing tasks |
 | `scripts/lint_v2_tasks_from_paths.sh ...` | Lint v2 artifacts for changed task paths (hooks/CI) |
 | `scripts/lint_root_cause.sh ...` | Validate RCA schema and anti-generic quality checks |
-| `scripts/generate_root_cause_clusters.sh ...` | Build recurrence report across task RCAs |
 | `scripts/lint_finding_quality.sh ...` | Enforce exploitability/repro consistency for confirmed findings |
-| `scripts/generate_benchmark_summary.sh ...` | Generate quality/evidence benchmark snapshot |
 | `scripts/init_bounty_context.sh` | Initialize bounty program assessment context |
 | `scripts/lint_bounty_assessment.sh ...` | Validate bounty ROI/fairness assessment |
 | `scripts/snapshot_bounty_rules.sh <url> <label>` | Archive bounty rules before disclosure |
@@ -202,21 +246,31 @@ Needs-review ledger:
 | Variable | Default | Purpose |
 |---|---:|---|
 | `MAX_ITERATIONS` | `50` | Stop condition |
+| `RALPH_MODE` | `DETECT` | `AUTO`, `PLANNING`, `BUILDING`, `DETECT`, `PATCH`, `EXPLOIT` |
+| `STOP_ON_SUCCESS` | `true` | Stop immediately when explicit mode passes its grader |
+| `AUTO_COMMIT` | `false` | Auto-commit each iteration when set true |
 | `COMPUTE_BUDGET` | `100` | Adaptive budget |
 | `ADAPTIVE_MODE` | `true` | Budget-aware execution |
-| `DOCS_DISCOVERY` | `false` | Discover/fetch integration docs |
-| `DOCS_FETCH` | `false` | Fetch docs from URL list |
+| `CODEX_HOME` | `./.codex-runtime` | Codex session/runtime directory (workspace-local by default in loop) |
 | `HARD_ENFORCEMENT` | `true` | Enforce artifact schemas |
-| `ENGINEERING_GUARDRAILS` | `true` | Global prompt guardrails |
+| `ENGINEERING_GUARDRAILS` | `false` | Global prompt guardrails |
 | `GUARDRAILS_PROMPT_FILE` | `PROMPT_engineering.md` | Guardrails prompt file |
 | `BOUNTY_MODE` | `false` | Enable bug-bounty pre-hunt gating/enforcement |
-| `SKIP_PRECHECK` | `false` | Skip code index + attack surface regeneration |
+| `SKIP_PRECHECK` | `true` | Skip code index + attack surface regeneration |
 | `PRECHECK_REFRESH` | `false` | Force regeneration of precheck artifacts |
-| `LEAN_MODE` | `false` | Force high-throughput defaults (skip precheck/docs refresh side-work) |
+| `LEAN_MODE` | `false` | Force high-throughput defaults |
+| `DETECT_GROUND_TRUTH` | _(unset)_ | Ground-truth vulnerability list for detect recall grading |
+| `DETECT_MIN_RECALL` | `0.80` | Minimum recall threshold for detect pass |
+| `PATCH_TEST_CMD` | `forge test -vvv` | Baseline patch verification test command |
+| `PATCH_EXPLOIT_TEST_CMD` | _(unset)_ | Exploit regression command (must fail post-patch) |
+| `EXPLOIT_REPLAY_CMD` | _(unset)_ | Replay command used by exploit grader |
+| `EXPLOIT_CHECK_CMD` | _(unset)_ | Exploit success check command |
 
-Key output artifacts:
-- `findings/root_cause_clusters.md`
-- `findings/benchmark_summary.md`
+Primary output artifacts:
+- `submission/audit.md`
+- `submission/patch.md`
+- `submission/txs.md`
+- `submission/exploit.md`
 
 ---
 

@@ -38,8 +38,13 @@ log_warning() {
 
 # Check prerequisites
 check_prerequisites() {
+    # Auto-detect local workspace installation.
+    if [ ! -x "$(command -v codeql 2>/dev/null)" ] && [ -x ".tools/codeql/codeql" ]; then
+        export PATH="$PWD/.tools/codeql:$PATH"
+    fi
+
     if ! command -v codeql &> /dev/null; then
-        log_error "CodeQL CLI not found. Please install from https://github.com/github/codeql-cli-binaries"
+        log_error "CodeQL CLI not found. Run: ./scripts/install_codeql.sh"
         exit 1
     fi
     
