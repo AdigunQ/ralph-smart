@@ -81,6 +81,34 @@ One-command bootstrap for GitHub clones:
 export PATH="$PWD/.tools/codeql:$PATH"
 ```
 
+`bootstrap.sh` installs CodeQL and also attempts to fetch/update both optional knowledge repos (EIP handbook + protocol vulnerabilities index).
+
+### EIP Handbook Integration (Optional, Recommended)
+
+Ralph can import EIP/ERC heuristic checks from the EIP Security Handbook.
+
+```bash
+./scripts/fetch_eip_handbook.sh
+python3 scripts/generate_eip_security_checklist.py \
+  --target-dir ./target \
+  --handbook-dir tools/EIP-Security-Handbook/src \
+  --output findings/eip_security_checklist.md \
+  --json-output findings/eip_security_checklist.json
+```
+
+### Protocol Vulnerabilities Index Integration (Optional, Recommended)
+
+Ralph can also import protocol-specific vulnerability categories from the Protocol Vulnerabilities Index.
+
+```bash
+./scripts/fetch_protocol_vuln_index.sh
+python3 scripts/generate_protocol_vuln_checklist.py \
+  --target-dir ./target \
+  --index-dir tools/protocol-vulnerabilities-index \
+  --output findings/protocol_vulnerability_checklist.md \
+  --json-output findings/protocol_vulnerability_checklist.json
+```
+
 ---
 
 ## Core Methodology
@@ -221,10 +249,14 @@ Needs-review ledger:
 | `./scripts/run_detect.sh` | Fast detect wrapper (recommended default) |
 | `./scripts/run_patch.sh` | Fast patch wrapper |
 | `./scripts/run_exploit.sh` | Fast exploit wrapper |
+| `./scripts/fetch_eip_handbook.sh` | Clone/pull EIP Security Handbook into `tools/` |
+| `./scripts/fetch_protocol_vuln_index.sh` | Clone/pull Protocol Vulnerabilities Index into `tools/` |
 | `./scripts/run_codeql_baseline.sh` | Deterministic baseline queries |
 | `./scripts/grade_detect.sh` | Deterministic detect grading |
 | `./scripts/grade_patch.sh` | Deterministic patch grading |
 | `./scripts/grade_exploit.sh` | Deterministic exploit grading |
+| `python3 scripts/generate_eip_security_checklist.py ...` | Generate EIP/ERC heuristic checklist from handbook |
+| `python3 scripts/generate_protocol_vuln_checklist.py ...` | Generate protocol-category checklist from index |
 | `python3 scripts/rpc_gatekeeper.py --upstream <rpc>` | Block unsafe local-chain RPC methods |
 | `python3 scripts/update_code_index.py ...` | Target code index |
 | `python3 scripts/attack_surface.py ...` | Attack surface map |
@@ -258,6 +290,14 @@ Needs-review ledger:
 | `BOUNTY_MODE` | `false` | Enable bug-bounty pre-hunt gating/enforcement |
 | `SKIP_PRECHECK` | `true` | Skip code index + attack surface regeneration |
 | `PRECHECK_REFRESH` | `false` | Force regeneration of precheck artifacts |
+| `EIP_HANDBOOK_DIR` | `tools/EIP-Security-Handbook/src` | Source directory for EIP handbook heuristics |
+| `EIP_CHECKLIST_OUT` | `findings/eip_security_checklist.md` | Markdown output path for EIP checklist |
+| `EIP_CHECKLIST_JSON` | `findings/eip_security_checklist.json` | JSON output path for EIP checklist |
+| `EIP_CHECKLIST_REFRESH` | `false` | Force regeneration of EIP checklist |
+| `PROTOCOL_VULN_INDEX_DIR` | `tools/protocol-vulnerabilities-index` | Source directory for protocol vulnerability index |
+| `PROTOCOL_VULN_CHECKLIST_OUT` | `findings/protocol_vulnerability_checklist.md` | Markdown output path for protocol checklist |
+| `PROTOCOL_VULN_CHECKLIST_JSON` | `findings/protocol_vulnerability_checklist.json` | JSON output path for protocol checklist |
+| `PROTOCOL_VULN_CHECKLIST_REFRESH` | `false` | Force regeneration of protocol checklist |
 | `LEAN_MODE` | `false` | Force high-throughput defaults |
 | `DETECT_GROUND_TRUTH` | _(unset)_ | Ground-truth vulnerability list for detect recall grading |
 | `DETECT_MIN_RECALL` | `0.80` | Minimum recall threshold for detect pass |

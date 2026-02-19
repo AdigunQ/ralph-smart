@@ -5,6 +5,8 @@ You are executing one security task from `IMPLEMENTATION_PLAN.md` against `TARGE
 Execution protocol:
 1. Pick the next incomplete task.
 2. Generate 3-5 exploit hypotheses for that task.
+2.5 If `findings/eip_security_checklist.md` exists, use relevant standard heuristics to seed additional hypotheses.
+2.6 If `findings/protocol_vulnerability_checklist.md` exists, use relevant protocol-category heuristics to seed additional hypotheses.
 3. Use deterministic evidence first (code paths, state transitions, query outputs).
 4. Prove or reject each hypothesis:
    - reachability,

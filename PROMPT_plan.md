@@ -15,8 +15,10 @@ Plan requirements:
 1. Map core assets, trust boundaries, and privileged roles.
 2. List attack surfaces and external integrations visible in code.
 3. Generate 20-50 concrete security tasks using the 6 taint models (`INV`, `ASM`, `EXP`, `TMP`, `CMP`, `BND`).
-4. Prioritize by exploitability and impact (Critical first).
-5. Keep tasks testable and evidence-oriented.
+4. If `findings/eip_security_checklist.md` exists, include high-relevance EIP/ERC checklist items as explicit tasks.
+5. If `findings/protocol_vulnerability_checklist.md` exists, include top protocol-category checks as explicit tasks.
+6. Prioritize by exploitability and impact (Critical first).
+7. Keep tasks testable and evidence-oriented.
 
 `IMPLEMENTATION_PLAN.md` format:
 - Checklist items with stable task IDs (e.g., `INV-001`, `EXP-003`).

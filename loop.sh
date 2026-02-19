@@ -30,6 +30,14 @@ SKIP_PRECHECK=${SKIP_PRECHECK:-"true"}
 PRECHECK_REFRESH=${PRECHECK_REFRESH:-"false"}
 CODEQL_REFRESH=${CODEQL_REFRESH:-"false"}
 CODEQL_OUTPUT_DIR=${CODEQL_OUTPUT_DIR:-"findings/codeql_results"}
+EIP_HANDBOOK_DIR=${EIP_HANDBOOK_DIR:-"tools/EIP-Security-Handbook/src"}
+EIP_CHECKLIST_OUT=${EIP_CHECKLIST_OUT:-"findings/eip_security_checklist.md"}
+EIP_CHECKLIST_JSON=${EIP_CHECKLIST_JSON:-"findings/eip_security_checklist.json"}
+EIP_CHECKLIST_REFRESH=${EIP_CHECKLIST_REFRESH:-"false"}
+PROTOCOL_VULN_INDEX_DIR=${PROTOCOL_VULN_INDEX_DIR:-"tools/protocol-vulnerabilities-index"}
+PROTOCOL_VULN_CHECKLIST_OUT=${PROTOCOL_VULN_CHECKLIST_OUT:-"findings/protocol_vulnerability_checklist.md"}
+PROTOCOL_VULN_CHECKLIST_JSON=${PROTOCOL_VULN_CHECKLIST_JSON:-"findings/protocol_vulnerability_checklist.json"}
+PROTOCOL_VULN_CHECKLIST_REFRESH=${PROTOCOL_VULN_CHECKLIST_REFRESH:-"false"}
 
 DETECT_GRADER=${DETECT_GRADER:-"scripts/grade_detect.sh"}
 PATCH_GRADER=${PATCH_GRADER:-"scripts/grade_patch.sh"}
@@ -233,11 +241,51 @@ run_codeql_baseline() {
   return 0
 }
 
+run_eip_checklist() {
+  [ -f "scripts/generate_eip_security_checklist.py" ] || return 0
+  [ -d "$EIP_HANDBOOK_DIR" ] || { log "EIP handbook not found at $EIP_HANDBOOK_DIR; skipping EIP checklist."; return 0; }
+  command -v python3 >/dev/null 2>&1 || { log_warning "python3 not found, skipping EIP checklist."; return 0; }
+
+  if [ -f "$EIP_CHECKLIST_OUT" ] && [ "$EIP_CHECKLIST_REFRESH" != "true" ]; then
+    log "EIP checklist exists. Skipping (EIP_CHECKLIST_REFRESH=false)."
+    return 0
+  fi
+
+  log "Generating EIP security checklist from handbook..."
+  python3 scripts/generate_eip_security_checklist.py \
+    --target-dir "$TARGET_DIR" \
+    --handbook-dir "$EIP_HANDBOOK_DIR" \
+    --output "$EIP_CHECKLIST_OUT" \
+    --json-output "$EIP_CHECKLIST_JSON" || log_warning "EIP checklist generation failed, continuing"
+  return 0
+}
+
+run_protocol_vuln_checklist() {
+  [ -f "scripts/generate_protocol_vuln_checklist.py" ] || return 0
+  [ -d "$PROTOCOL_VULN_INDEX_DIR" ] || { log "Protocol vuln index not found at $PROTOCOL_VULN_INDEX_DIR; skipping protocol checklist."; return 0; }
+  command -v python3 >/dev/null 2>&1 || { log_warning "python3 not found, skipping protocol checklist."; return 0; }
+
+  if [ -f "$PROTOCOL_VULN_CHECKLIST_OUT" ] && [ "$PROTOCOL_VULN_CHECKLIST_REFRESH" != "true" ]; then
+    log "Protocol checklist exists. Skipping (PROTOCOL_VULN_CHECKLIST_REFRESH=false)."
+    return 0
+  fi
+
+  log "Generating protocol vulnerability checklist from index..."
+  python3 scripts/generate_protocol_vuln_checklist.py \
+    --target-dir "$TARGET_DIR" \
+    --index-dir "$PROTOCOL_VULN_INDEX_DIR" \
+    --output "$PROTOCOL_VULN_CHECKLIST_OUT" \
+    --json-output "$PROTOCOL_VULN_CHECKLIST_JSON" || log_warning "Protocol checklist generation failed, continuing"
+  return 0
+}
+
 bootstrap_for_mode() {
   local mode="$1"
   case "$mode" in
     DETECT)
       run_codeql_baseline
+      run_eip_checklist
+      run_protocol_vuln_checklist
       ;;
     PATCH|EXPLOIT)
       log "Skipping preflight and CodeQL baseline for mode $mode."
@@ -245,6 +293,8 @@ bootstrap_for_mode() {
     *)
       run_preflight
       run_codeql_baseline
+      run_eip_checklist
+      run_protocol_vuln_checklist
       ;;
   esac
 }
@@ -368,6 +418,10 @@ print_header() {
   log "  - Bounty Mode: $BOUNTY_MODE"
   log "  - Skip Precheck: $SKIP_PRECHECK"
   log "  - CODEX_HOME: $RUNTIME_CODEX_HOME"
+  log "  - EIP Handbook Dir: $EIP_HANDBOOK_DIR"
+  log "  - EIP Checklist Out: $EIP_CHECKLIST_OUT"
+  log "  - Protocol Vuln Index Dir: $PROTOCOL_VULN_INDEX_DIR"
+  log "  - Protocol Checklist Out: $PROTOCOL_VULN_CHECKLIST_OUT"
 }
 
 main() {

@@ -8,6 +8,8 @@ Objective:
 
 Execution rules:
 1. Start from deterministic evidence where possible (CodeQL outputs, call-path tracing, explicit state transitions).
+1.5 If `findings/eip_security_checklist.md` exists, prioritize checks for the listed relevant EIP/ERC standards.
+1.6 If `findings/protocol_vulnerability_checklist.md` exists, prioritize high-scoring protocol vulnerability categories.
 2. For each finding, prove:
    - reachability,
    - attacker controllability,

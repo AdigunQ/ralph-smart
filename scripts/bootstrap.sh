@@ -14,6 +14,18 @@ else
   exit 1
 fi
 
+if [ -x "./scripts/fetch_eip_handbook.sh" ]; then
+  ./scripts/fetch_eip_handbook.sh || {
+    echo "EIP handbook fetch failed. You can retry with: ./scripts/fetch_eip_handbook.sh"
+  }
+fi
+
+if [ -x "./scripts/fetch_protocol_vuln_index.sh" ]; then
+  ./scripts/fetch_protocol_vuln_index.sh || {
+    echo "Protocol vulnerability index fetch failed. You can retry with: ./scripts/fetch_protocol_vuln_index.sh"
+  }
+fi
+
 echo ""
 echo "Bootstrap complete."
 echo "Run this in your shell before auditing:"

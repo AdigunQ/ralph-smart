@@ -291,6 +291,8 @@ cd target && aptos move test
 7. **NEW**: Allocate compute based on signal strength
 8. **NEW**: Pass all 5 verification gates before reporting
 9. **NEW**: For external integrations, compare code against integrator docs and hunt mismatches (doc-first, no generic checklist)
+10. **NEW**: Use `findings/eip_security_checklist.md` (generated from EIP Security Handbook) to drive standard-specific checks
+11. **NEW**: Use `findings/protocol_vulnerability_checklist.md` (generated from Protocol Vulnerabilities Index) to drive protocol-category hypothesis seeds
 
 ---
 
