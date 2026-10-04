@@ -1,0 +1,60 @@
+name: Bor v2.10.2 TransactionsMsg wire pressure
+
+on:
+  push:
+    branches: [bor-v2102-security-lab-20261003]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone exact release and install probe
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 --branch v2.10.2 https://github.com/0xPolygon/bor.git bor
+          test "$(git -C bor rev-parse HEAD)" = "9c445ef603e71469e1c176d8e57e7cf94864ade7"
+          cp security/bor_txgossip_wire_pressure_test.go bor/eth/protocols/eth/lab_txgossip_wire_pressure_test.go
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: bor/go.mod
+          cache: false
+      - name: Build test binary once
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd bor
+          go test -c ./eth/protocols/eth -o ../eth-protocol.test
+      - name: Passing control
+        shell: bash
+        run: |
+          set -o pipefail
+          /usr/bin/time -v ./eth-protocol.test -test.run '^TestLabTransactionsWireControl$' -test.count=1 -test.v 2>&1 | tee TXGOSSIP_CONTROL.log
+      - name: Near-limit wire packet
+        shell: bash
+        run: |
+          set -o pipefail
+          /usr/bin/time -v ./eth-protocol.test -test.run '^TestLabTransactionsWireNearLimit$' -test.count=1 -test.v 2>&1 | tee TXGOSSIP_ATTACK.log
+      - name: Capture evidence
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence
+          cp TXGOSSIP_CONTROL.log TXGOSSIP_ATTACK.log evidence/ 2>/dev/null || true
+          cp security/bor_txgossip_wire_pressure_test.go evidence/
+          git -C bor rev-parse HEAD > evidence/BOR_COMMIT.txt
+          go version > evidence/GO_VERSION.txt
+          sha256sum eth-protocol.test > evidence/TEST_BINARY_SHA256.txt 2>/dev/null || true
+      - name: Upload raw logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bor-v2.10.2-txgossip-wire
+          path: evidence
+          retention-days: 5
