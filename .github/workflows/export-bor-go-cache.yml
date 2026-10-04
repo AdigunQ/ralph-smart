@@ -12,7 +12,7 @@ permissions:
 jobs:
   export:
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - name: Clone pinned Bor release
@@ -26,27 +26,29 @@ jobs:
         with:
           go-version-file: bor/go.mod
           cache: false
-      - name: Populate dependency cache
+      - name: Populate complete dependency cache
         shell: bash
         run: |
           set -euxo pipefail
           cd bor
+          go mod download all
           go test ./eth/fetcher -run '^$' -count=1
           go test ./core ./core/state -run '^$' -count=1
+          go test ./cmd/devp2p/internal/ethtest -run '^$' -count=1
           go env GOMODCACHE GOCACHE GOPATH | tee ../GO_CACHE_PATHS.txt
       - name: Archive module cache
         shell: bash
         run: |
           set -euxo pipefail
           GOMODCACHE=$(go env GOMODCACHE)
-          tar -C "$(dirname "$GOMODCACHE")" -czf bor-v2.10.2-gomodcache.tar.gz "$(basename "$GOMODCACHE")"
-          du -h bor-v2.10.2-gomodcache.tar.gz
-          sha256sum bor-v2.10.2-gomodcache.tar.gz | tee GOMODCACHE_SHA256.txt
+          tar -C "$(dirname "$GOMODCACHE")" -czf bor-v2.10.2-gomodcache-full.tar.gz "$(basename "$GOMODCACHE")"
+          du -h bor-v2.10.2-gomodcache-full.tar.gz
+          sha256sum bor-v2.10.2-gomodcache-full.tar.gz | tee GOMODCACHE_SHA256.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: bor-v2.10.2-gomodcache
+          name: bor-v2.10.2-gomodcache-full
           path: |
-            bor-v2.10.2-gomodcache.tar.gz
+            bor-v2.10.2-gomodcache-full.tar.gz
             GOMODCACHE_SHA256.txt
             GO_CACHE_PATHS.txt
           retention-days: 2
