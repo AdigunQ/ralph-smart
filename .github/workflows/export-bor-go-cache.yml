@@ -1,0 +1,52 @@
+name: Export Bor v2.10.2 dependency cache
+
+on:
+  push:
+    branches:
+      - bor-cache-export-20261004
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone pinned Bor release
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 --branch v2.10.2 https://github.com/0xPolygon/bor.git bor
+          cd bor
+          test "$(git rev-parse HEAD)" = "9c445ef603e71469e1c176d8e57e7cf94864ade7"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: bor/go.mod
+          cache: false
+      - name: Populate dependency cache
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd bor
+          go test ./eth/fetcher -run '^$' -count=1
+          go test ./core ./core/state -run '^$' -count=1
+          go env GOMODCACHE GOCACHE GOPATH | tee ../GO_CACHE_PATHS.txt
+      - name: Archive module cache
+        shell: bash
+        run: |
+          set -euxo pipefail
+          GOMODCACHE=$(go env GOMODCACHE)
+          tar -C "$(dirname "$GOMODCACHE")" -czf bor-v2.10.2-gomodcache.tar.gz "$(basename "$GOMODCACHE")"
+          du -h bor-v2.10.2-gomodcache.tar.gz
+          sha256sum bor-v2.10.2-gomodcache.tar.gz | tee GOMODCACHE_SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bor-v2.10.2-gomodcache
+          path: |
+            bor-v2.10.2-gomodcache.tar.gz
+            GOMODCACHE_SHA256.txt
+            GO_CACHE_PATHS.txt
+          retention-days: 2
