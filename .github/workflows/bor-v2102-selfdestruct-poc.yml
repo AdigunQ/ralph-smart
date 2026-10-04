@@ -1,0 +1,52 @@
+name: Bor v2.10.2 SELFDESTRUCT balance PoC
+
+on:
+  push:
+    branches:
+      - bor-v2102-security-lab-20261003
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  poc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout harness
+        uses: actions/checkout@v4
+
+      - name: Clone exact Bor release
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 --branch v2.10.2 https://github.com/0xPolygon/bor.git bor
+          test "$(git -C bor rev-parse HEAD)" = "9c445ef603e71469e1c176d8e57e7cf94864ade7"
+          cp security/bor_selfdestruct_balance_poc_test.go bor/core/lab_selfdestruct_balance_poc_test.go
+
+      - name: Set up pinned Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: bor/go.mod
+          cache: false
+
+      - name: Run source-level differential and control
+        shell: bash
+        run: |
+          set -o pipefail
+          cd bor
+          go version | tee ../GO_VERSION.txt
+          git rev-parse HEAD | tee ../BOR_COMMIT.txt
+          go test ./core -run '^TestLabV2SelfDestructBalanceDivergence$' -count=1 -v 2>&1 | tee ../SELFDESTRUCT_POC.log
+
+      - name: Upload raw evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bor-v2.10.2-selfdestruct-poc
+          path: |
+            BOR_COMMIT.txt
+            GO_VERSION.txt
+            SELFDESTRUCT_POC.log
+          retention-days: 5
