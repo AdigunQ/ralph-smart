@@ -1,0 +1,38 @@
+name: Export Go 1.26.5 toolchain
+
+on:
+  push:
+    branches:
+      - bor-go-export-20261004
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.5'
+          cache: false
+      - name: Package toolchain
+        shell: bash
+        run: |
+          set -euxo pipefail
+          go version | tee GO_VERSION.txt
+          GOROOT=$(go env GOROOT)
+          tar -C "$(dirname "$GOROOT")" -czf go1.26.5-linux-amd64.tar.gz "$(basename "$GOROOT")"
+          sha256sum go1.26.5-linux-amd64.tar.gz | tee GO_TOOLCHAIN_SHA256.txt
+          du -h go1.26.5-linux-amd64.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: go1.26.5-linux-amd64
+          path: |
+            go1.26.5-linux-amd64.tar.gz
+            GO_VERSION.txt
+            GO_TOOLCHAIN_SHA256.txt
+          retention-days: 2
