@@ -1,0 +1,75 @@
+name: Bor v2.10.2 security lab
+
+on:
+  push:
+    branches:
+      - bor-v2102-security-lab-20261003
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout scratch branch
+        uses: actions/checkout@v4
+
+      - name: Clone pinned Bor release
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 --branch v2.10.2 https://github.com/0xPolygon/bor.git bor
+          cd bor
+          test "$(git rev-parse HEAD)" = "9c445ef603e71469e1c176d8e57e7cf94864ade7"
+          git status --short
+          git rev-parse HEAD | tee ../BOR_COMMIT.txt
+
+      - name: Set up Go from Bor go.mod
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: bor/go.mod
+          cache: false
+
+      - name: Build unmodified Bor
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd bor
+          go version | tee ../GO_VERSION.txt
+          make bor 2>&1 | tee ../BUILD.log
+          ./build/bin/bor version 2>&1 | tee ../BOR_VERSION.txt
+          sha256sum ./build/bin/bor | tee ../BOR_BINARY_SHA256.txt
+
+      - name: Package source and binary
+        shell: bash
+        run: |
+          set -euxo pipefail
+          tar --exclude=bor/.git -czf bor-v2.10.2-source.tar.gz bor
+          cp bor/build/bin/bor bor-v2.10.2-linux-amd64
+          sha256sum bor-v2.10.2-source.tar.gz bor-v2.10.2-linux-amd64 > ARTIFACT_SHA256.txt
+
+      - name: Upload pinned source
+        uses: actions/upload-artifact@v4
+        with:
+          name: bor-v2.10.2-source
+          path: |
+            bor-v2.10.2-source.tar.gz
+            BOR_COMMIT.txt
+          retention-days: 2
+
+      - name: Upload release binary and build evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: bor-v2.10.2-binary
+          path: |
+            bor-v2.10.2-linux-amd64
+            BOR_COMMIT.txt
+            GO_VERSION.txt
+            BOR_VERSION.txt
+            BOR_BINARY_SHA256.txt
+            ARTIFACT_SHA256.txt
+            BUILD.log
+          retention-days: 2
