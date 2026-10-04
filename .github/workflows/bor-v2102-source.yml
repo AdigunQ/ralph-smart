@@ -43,20 +43,29 @@ jobs:
           ./build/bin/bor version 2>&1 | tee ../BOR_VERSION.txt
           sha256sum ./build/bin/bor | tee ../BOR_BINARY_SHA256.txt
 
-      - name: Package source and binary
+      - name: Package lean source and binary
         shell: bash
         run: |
           set -euxo pipefail
-          tar --exclude=bor/.git -czf bor-v2.10.2-source.tar.gz bor
+          tar \
+            --exclude=bor/.git \
+            --exclude='bor/**/testdata' \
+            --exclude='bor/**/testdata/**' \
+            --exclude='bor/build' \
+            --exclude='bor/build/**' \
+            --exclude='bor/tests/testdata' \
+            --exclude='bor/tests/testdata/**' \
+            -czf bor-v2.10.2-lean-source.tar.gz bor
           cp bor/build/bin/bor bor-v2.10.2-linux-amd64
-          sha256sum bor-v2.10.2-source.tar.gz bor-v2.10.2-linux-amd64 > ARTIFACT_SHA256.txt
+          du -h bor-v2.10.2-lean-source.tar.gz bor-v2.10.2-linux-amd64
+          sha256sum bor-v2.10.2-lean-source.tar.gz bor-v2.10.2-linux-amd64 > ARTIFACT_SHA256.txt
 
-      - name: Upload pinned source
+      - name: Upload lean pinned source
         uses: actions/upload-artifact@v4
         with:
-          name: bor-v2.10.2-source
+          name: bor-v2.10.2-lean-source
           path: |
-            bor-v2.10.2-source.tar.gz
+            bor-v2.10.2-lean-source.tar.gz
             BOR_COMMIT.txt
           retention-days: 2
 
