@@ -1,0 +1,57 @@
+name: Bor v2.10.2 Bor-mainnet V2 parity fuzz
+
+on:
+  push:
+    branches: [bor-v2102-security-lab-20261003]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone exact release and install fuzz lane
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 --branch v2.10.2 https://github.com/0xPolygon/bor.git bor
+          test "$(git -C bor rev-parse HEAD)" = "9c445ef603e71469e1c176d8e57e7cf94864ade7"
+          cp security/bor_v2_bormainnet_fuzz_test.go bor/core/lab_bormainnet_fuzz_test.go
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: bor/go.mod
+          cache: false
+      - name: Seed/control run
+        shell: bash
+        run: |
+          set -o pipefail
+          cd bor
+          go test ./core -run '^FuzzLabBorMainnetV2Parity$' -count=1 -v 2>&1 | tee ../BOR_MAINNET_SEEDS.log
+      - name: Differential fuzz
+        shell: bash
+        run: |
+          set -o pipefail
+          cd bor
+          go test ./core -run '^$' -fuzz '^FuzzLabBorMainnetV2Parity$' -fuzztime=12m -parallel=8 -timeout=15m -v 2>&1 | tee ../BOR_MAINNET_FUZZ.log
+      - name: Capture generated corpus
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p fuzz-artifacts
+          cp BOR_MAINNET_SEEDS.log fuzz-artifacts/ 2>/dev/null || true
+          cp BOR_MAINNET_FUZZ.log fuzz-artifacts/ 2>/dev/null || true
+          cp bor/core/lab_bormainnet_fuzz_test.go fuzz-artifacts/
+          cp -R bor/core/testdata/fuzz/FuzzLabBorMainnetV2Parity fuzz-artifacts/corpus 2>/dev/null || true
+          git -C bor rev-parse HEAD > fuzz-artifacts/BOR_COMMIT.txt
+          go version > fuzz-artifacts/GO_VERSION.txt
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bor-v2.10.2-bormainnet-fuzz
+          path: fuzz-artifacts
+          retention-days: 5
